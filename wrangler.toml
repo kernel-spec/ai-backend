@@ -1,1 +1,6 @@
+name = "ai-backend"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
 
+[vars]
+# žádné proměnné tady – secrets jsou v Cloudflare UI
