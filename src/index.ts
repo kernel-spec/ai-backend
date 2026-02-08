@@ -18,14 +18,15 @@ export default {
       return new Response("Missing input", { status: 400 });
     }
 
-    // 3. Audit: request_id + hash
+    // 3. Audit: request_id + input hash
     const requestId = crypto.randomUUID();
     const encoder = new TextEncoder();
-    const requestHashBuffer = await crypto.subtle.digest(
+
+    const inputHashBuffer = await crypto.subtle.digest(
       "SHA-256",
       encoder.encode(userInput)
     );
-    const requestHash = [...new Uint8Array(requestHashBuffer)]
+    const inputHash = [...new Uint8Array(inputHashBuffer)]
       .map(b => b.toString(16).padStart(2, "0"))
       .join("");
 
@@ -49,32 +50,38 @@ export default {
     );
 
     if (!openaiResponse.ok) {
-      return new Response("OpenAI error", { status: 502 });
+      return new Response(
+        JSON.stringify({ error: "OpenAI error" }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
+      );
     }
 
     const data = await openaiResponse.json();
-    const output = data.choices?.[0]?.message?.content ?? "";
+    const reply =
+      data?.choices?.[0]?.message?.content ?? "";
 
-    // 5. Audit: response hash
-    const responseHashBuffer = await crypto.subtle.digest(
+    // 5. Audit: output hash
+    const outputHashBuffer = await crypto.subtle.digest(
       "SHA-256",
-      encoder.encode(output)
+      encoder.encode(reply)
     );
-    const responseHash = [...new Uint8Array(responseHashBuffer)]
+    const outputHash = [...new Uint8Array(outputHashBuffer)]
       .map(b => b.toString(16).padStart(2, "0"))
       .join("");
 
-    // 6. Return response (no decisions)
+    // 6. Final response (Custom GPT friendly)
     return new Response(
-  JSON.stringify({
-    reply: output,
-    request_id: requestId,
-    audit: {
-      input_hash: requestHash,
-      output_hash: responseHash
-    }
-  }),
-  {
-    headers: { "Content-Type": "application/json" }
+      JSON.stringify({
+        reply: reply,
+        request_id: requestId,
+        audit: {
+          input_hash: inputHash,
+          output_hash: outputHash
+        }
+      }),
+      {
+        headers: { "Content-Type": "application/json" }
+      }
+    );
   }
-);
+};
