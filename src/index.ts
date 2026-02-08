@@ -66,15 +66,15 @@ export default {
 
     // 6. Return response (no decisions)
     return new Response(
-      JSON.stringify({
-        request_id: requestId,
-        input_hash: requestHash,
-        output_hash: responseHash,
-        output: output
-      }),
-      {
-        headers: { "Content-Type": "application/json" }
-      }
-    );
+  JSON.stringify({
+    reply: output,
+    request_id: requestId,
+    audit: {
+      input_hash: requestHash,
+      output_hash: responseHash
+    }
+  }),
+  {
+    headers: { "Content-Type": "application/json" }
   }
-};
+);
