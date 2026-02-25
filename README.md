@@ -13,6 +13,9 @@
 - [Konfigurace a secrets](#konfigurace-a-secrets)
 - [Deploy](#deploy)
 
+> 📄 Stručný A–H přehled pro nové přispěvatele: [`docs/overview.md`](docs/overview.md)  
+> 🔍 Detailní auditní zpráva: [`docs/audit.md`](docs/audit.md)
+
 ---
 
 ## Co to je
